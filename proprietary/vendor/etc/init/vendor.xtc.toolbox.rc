@@ -1,0 +1,47 @@
+on post-fs
+    chmod 0662 /sys/kernel/xtc_msg_hub/msg_hub
+    chmod 0662 /sys/kernel/xtc_msg_hub/msg_switch
+
+# set nv
+service readnv /vendor/bin/readnv
+    class late_start
+    user root
+    group root system
+    oneshot
+    seclabel u:r:vendor_xtc:s0
+
+service prd_barcode_arg /vendor/bin/xtc_secure_client v smplap32 61 1
+    user root
+    disabled
+    oneshot
+    seclabel u:r:vendor_xtc:s0
+
+service prd_get_barcode /vendor/bin/xtc_secure_client v smplap32 62 1
+    user root
+    disabled
+    oneshot
+    seclabel u:r:vendor_xtc:s0
+
+on property:log.tag.msghub=1
+	write /sys/kernel/xtc_msg_hub/msg_switch "off"
+
+on property:log.tag.msghub=0
+	write /sys/kernel/xtc_msg_hub/msg_switch "on"
+
+on property:log.tag.barcode_arg=*
+	start prd_barcode_arg
+
+on property:log.tag.get_barcode=1
+    start prd_get_barcode
+
+on property:persist.vendor.uart.flag=*
+    setprop persist.sys.uart.flag ${persist.vendor.uart.flag}
+
+on property:persist.vendor.xtc.adb_port=*
+    setprop persist.sys.xtc.adb_port ${persist.vendor.xtc.adb_port}
+
+on property:persist.sys.port.close=*
+    setprop persist.vendor.port.close ${persist.sys.port.close}
+
+on property:persist.sys.usb.flag=*
+    setprop persist.vendor.usb.flag ${persist.sys.usb.flag}

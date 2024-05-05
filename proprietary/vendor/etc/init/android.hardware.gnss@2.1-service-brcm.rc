@@ -1,0 +1,4 @@
+service gnss_service /vendor/bin/hw/ignss_2_1_bbkqandroid
+		class hal
+		user gps
+		group system gps radio

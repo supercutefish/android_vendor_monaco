@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<glgps xmlns="http://www.glpals.com/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.glpals.com/ glconfig.xsd" >
+  <!--HAL Confguration  -->
+  <hal
+    PortName="lhd"
+    GpioDelayMs="130"
+    LogEnabled="false"
+    Log="FILE"
+    LogDirectory="/data/vendor/gps/log/gps"
+    CtrlPipe="/data/vendor/gps/glgpsctrl"
+    NvStorageDir="/data/vendor/gps/"
+    NmeaOutName="/data/vendor/gps/gpspipe"
+
+    WakeLock="geo"
+
+    LPmode="true"
+    ReAidingOnHotStart="true"
+    SuplSslMethod="SSLv23_NO_TLSv1_2"
+    SuplEnable="false"
+
+    HttpDirectSyncLto="true"
+    LtoConfig="gllto.glpals.com/7day/v5/latest/lto2.dat"
+    LtoDir="/data/vendor/gps/"
+    LtoSyncThresholdDays="1"
+    RtiConfig="gllto.glpals.com/rtistatus4.dat" 
+    RtoEnable="false"
+
+    AssertEnabled="false"
+  />
+
+  <gll
+    LogPriMask="LOG_INFO"
+    LogFacMask="LOG_GLLAPI | LOG_NMEA | LOG_RAWDATA | LOG_GLLIO"
+    FrqPlan="FRQ_PLAN_26MHZ_2PPM"
+    RfType="GL_RF_4776_BRCM"
+    OnChipLogPriMask="LOG_INFO"
+    OnChipLogFacMask="LOG_GLLIO | LOG_INTEGR | LOG_NMEA"
+    MultiCarrLnaMask="L1_EXT_ON | L5_EXT_ON"
+    MultiCarrRFMode="GL_MULTI_CARR_RF_MODE_L1_L5"
+    GpsCarrierType="3,2,3,1,2,3,2,3,3,3,1,2,1,1,2,1,2,1,1,1,1,1,1,3,3,3,3,1,2,3,2,3"
+
+    OnChipMaxNumChannels="42"
+    PvtBatchingMode="Gps|Gln|Gal|Qzs|Bds"
+    OnChipMultiCarrLnaMask="L1_EXT_ON|L5_EXT_ON"
+    OnChipMultiCarrRFMode="GL_MULTI_CARR_RF_MODE_L1_L5"
+    OnChipGpsCarrierType="3,2,3,1,2,3,2,3,3,3,1,2,1,1,2,1,2,1,1,1,1,1,1,3,3,3,3,1,2,3,2,3"
+    
+    WarmStandbyTimeout1Seconds="10"
+    WarmStandbyTimeout2Seconds="20"
+    ExtL5Bias="20.3"
+	PsfDisableClamping="true"
+    > 
+  </gll>
+  <gll_features
+    EnableLowPowerPmm="true"
+    EnableACSD="true"
+    MPFCollect="true"
+  />
+
+<job Id="Periodic">
+    <task>
+        <req_pos ValidFixes="1000"/>
+    </task>
+</job>
+
+<!-- Periodic Position with the ROM almanac Ignored for simulator testing -->
+<job Id="Simulator_Periodic">
+    <task Id="cont" Repeat="1">
+        <startup IgnoreRomAlm="true"
+          IgnoreOsc="false"
+          IgnoreRamAlm="false"
+          IgnorePosition="true"
+          IgnoreNav="true"
+          IgnoreTime="true"
+/>
+        <req_pos ValidFixes="400" DurationSec="1200"/>
+    </task>
+</job>
+
+<!-- Combo-Mode (GPS+GLN+BDS) -->
+<!-- <job id="Factory_Combo_CW_Test"> -->
+<job Id="factory-L5-CW">
+	<task id="test" repeat="1">
+		<startup
+			IgnoreOsc="true"
+			IgnoreRomAlm="true"
+			IgnoreRamAlm="true"
+			IgnorePosition="true"
+			IgnoreNav="true"
+			IgnoreTime="true"
+		/>
+		<req_ftest
+			PRN="1"
+			FCN="0"
+			BDSPRN="11"
+			FactoryTestItems="GL_FACT_TEST_CW"
+			FactoryTestMode="GL_FACT_TEST_CONT"
+			AveragingIntervalSec="10"
+			DurationSec="30"
+		/>
+	</task>
+</job>
+
+<job Id="Combo-L5-CW">
+	<task Id="test" Repeat="1">
+		<startup         
+			IgnoreOsc="false"
+			IgnoreTime="true"
+			IgnorePosition="true"
+			IgnoreNav="true"
+			IgnoreRamAlm="true"
+			IgnoreRomAlm="true"
+		/>
+		<req_ftest
+			Prn="1"
+			PrnL5a="1"
+			FCN="0"
+			BDSPRN="11"
+			ConstellationL5a="GPS"
+			Disable200KhzCw="true"
+			FactoryTestItems="GL_FACT_TEST_CW"
+			FactoryTestMode="GL_FACT_TEST_CONT"
+			AveragingIntervalSec="10"
+			DurationSec="60"
+		/>
+	</task>
+</job>
+
+<!-- Combo-Mode (L1+L5) -->
+<!-- <job Id="factory-L5-CW"> -->
+<job Id="factory-L1-L5-CW">
+    <task Id="test" Repeat="1">
+        <!-- Instructs GLL to ignore all elements stored in NVRAM listed below -->
+        <startup
+            IgnoreOsc="false"
+            IgnoreTime="true"
+            IgnorePosition="true"
+            IgnoreNav="true"
+            IgnoreRamAlm="true"
+            IgnoreRomAlm="true"
+        />
+        <req_ftest
+            Prn="1"
+            PrnL5a="1"
+            ConstellationL5a="GPS"
+            Disable200KhzCw="true"
+            FactoryTestItems="GL_FACT_TEST_CW"
+            FactoryTestMode="GL_FACT_TEST_CONT"
+            AveragingIntervalSec="10"
+            DurationSec="1000"
+        />
+    </task>
+</job>
+
+<job Id="normal">
+    <task>
+        <req_pos ValidFixes="600"
+           DurationSec="600"	/>
+     </task>
+</job>
+
+<job Id="Simulator_normal">
+    <task Id="cont" Repeat="1">
+        <startup IgnoreRomAlm="true"
+          IgnoreOsc="false"
+          IgnoreRamAlm="false"
+
+/>
+        <req_pos ValidFixes="1200" DurationSec="1200"/>
+    </task>
+</job> 
+
+<job Id="Hot_Starts">
+   <task Repeat="50">
+       <req_pos ValidFix="1"/>
+   </task>	
+</job>
+
+<job Id="Warm_Starts">
+   <task Repeat="50">
+       <startup IgnoreNav="true"/>
+       <req_pos ValidFix="1"/>
+   </task>
+</job>
+
+<!-- Systematic Test: Repetitive warm starts performed on GNSS simulator -->
+<job Id="Simulator_Warm_Starts">
+   <task Repeat="50">
+      <startup 
+            IgnoreRomAlm="true"
+            IgnoreNav="true" 
+      />
+      <req_pos ValidFix="1"/>
+   </task>
+</job>
+
+<job Id="Cold_Starts">
+   <task Repeat="50">
+       <startup
+           IgnoreOsc="false"
+           IgnoreRamAlm="false"
+           IgnorePosition="true"
+           IgnoreNav="true"
+           IgnoreTime="true"
+       />
+       <req_pos ValidFix="1"/>
+   </task>
+</job>
+
+<!-- Systematic Test: Repetitive cold starts  -->
+<job Id="Simulator_Cold_Starts">
+   <task Repeat="1">
+       <startup
+           IgnoreRomAlm="true"
+           IgnoreOsc="false"
+           IgnoreRamAlm="false"
+           IgnorePosition="true"
+           IgnoreNav="true"
+           IgnoreTime="true"
+       />
+       <req_pos ValidFix="1" DurationSec="300"/>
+   </task>
+</job>
+
+<job id="gps_L5" >
+    <task id="spa_gps" >
+        <req_freq_scan ResolutionBandwidthHz="1000" VideoBandwidthHz="20" SampleSizeBits="1" SampleRateMsps="4" Band="GL_FACT_TEST_BAND_GPS" InitL1OffsetHz="-25000000" EndL1OffsetHz="25000000" CarrierBand="FREQ_SCAN_CARRIER_BAND_L5"  SlowPlatform="true" /> 
+    </task>
+</job>
+ 
+   <job id="glo_L1">
+    <task id="spa_glo">
+      <startup/>
+      <req_freq_scan ResolutionBandwidthHz="100" VideoBandwidthHz="10" InitL1OffsetHz="-5000000"
+            EndL1OffsetHz="5000000" SampleSizeBits="1" SampleRateMsps="1" Band="GL_FACT_TEST_BAND_GLONASS" CarrierBand="FREQ_SCAN_CARRIER_BAND_L1"  SlowPlatform="true"/>
+    </task>
+  </job>
+ 
+  <job id="bds_L1">
+    <task id="spa_bds">
+      <startup/>
+      <req_freq_scan ResolutionBandwidthHz="16" VideoBandwidthHz="16" SampleSizeBits="4" SampleRateMsps="4" Band="GL_FACT_TEST_BAND_BDS " CarrierBand="FREQ_SCAN_CARRIER_BAND_L1" SlowPlatform="true"/>
+    </task>
+  </job>
+
+<job id="spa_gps" > 
+<task id="spa_gps" > 
+<req_freq_scan ResolutionBandwidthHz="100" VideoBandwidthHz="5" 
+	SampleSizeBits="4" SampleRateMsps="4" 
+	Band="GL_FACT_TEST_BAND_GPS" 
+	SlowPlatform="true"
+/> 
+</task> 
+</job> 
+
+</glgps>
